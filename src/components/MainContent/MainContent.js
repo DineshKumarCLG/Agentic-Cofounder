@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import './MainContent.css';
 import AILogo from '../../assets/icons/AILogoLarge.png';
 import OutreachIcon from '../../assets/icons/Outreach.png';
@@ -10,7 +11,7 @@ import AgentSelectionIcon from '../../assets/icons/Agent Selection.png';
 import SidebarToggleIcon from '../../assets/icons/SidebarToggle.png';
 import ChatInterface from '../ChatInterface/ChatInterface';
 
-const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
+const MainContent = ({ toggleSidebar, isSidebarOpen, onNavigateToLibrary }) => {
   const [showChat, setShowChat] = useState(false);
   const [inputText, setInputText] = useState('');
   const [selectedOutreachOption, setSelectedOutreachOption] = useState('Outreach');
@@ -157,20 +158,37 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
   };
 
   return (
-    <div className={`main-content ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
-      <button 
+    <motion.div 
+      className={`main-content ${!isSidebarOpen ? 'sidebar-closed' : ''}`}
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+    >
+      <motion.button 
         className={`sidebar-toggle-btn glass-morphism ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
         onClick={toggleSidebar}
         aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
         <img src={SidebarToggleIcon} alt="Toggle Sidebar" className="toggle-icon" />
-      </button>
+      </motion.button>
       
       {showChat ? (
         <ChatInterface onBack={() => setShowChat(false)} isSidebarOpen={isSidebarOpen} />
       ) : (
-        <div className="content-wrapper">
-        <div className="logo-section">
+        <motion.div 
+          className="content-wrapper"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+        >
+        <motion.div 
+          className="logo-section"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+        >
           <div className="main-logo">
             <img 
               src={AILogo} 
@@ -178,54 +196,69 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
               className="logo-image"
             />
           </div>
-        </div>
+        </motion.div>
 
-        <div className="welcome-section">
+        <motion.div 
+          className="welcome-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
+        >
           <h1 className="welcome-text">What's new, USER?</h1>
-        </div>
+        </motion.div>
 
-        <div className="input-section">
-          <div className="input-wrapper-glass glass-morphism">
-            {showAgentDropdown && (
-              <div className="agent-dropdown glass-morphism" ref={agentDropdownRef}>
-                <div className="agent-dropdown-header">
-                  <img src={AgentSelectionIcon} alt="Agent Selection" className="agent-icon" />
-                  <span>Agent Selection</span>
-                </div>
-                {agents.map((agent, index) => (
-                  <div
-                    key={agent.id}
-                    className={`agent-item ${index === focusedAgentIndex ? 'focused' : ''}`}
-                    onClick={() => handleAgentSelect(agent)}
-                  >
-                    <div className={`agent-item-avatar ${agent.color || 'coordinator'}`}>
-                      {agent.name.charAt(0)}
-                    </div>
-                    <span className="agent-item-name">{agent.name}</span>
-                  </div>
-                ))}
+        <motion.div 
+          className="input-section"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7, ease: "easeOut" }}
+        >
+          {showAgentDropdown && (
+            <div className="agent-dropdown glass-morphism" ref={agentDropdownRef}>
+              <div className="agent-dropdown-header">
+                <img src={AgentSelectionIcon} alt="Agent Selection" className="agent-icon" />
+                <span>Agent Selection</span>
               </div>
-            )}
+              {agents.map((agent, index) => (
+                <div
+                  key={agent.id}
+                  className={`agent-item ${index === focusedAgentIndex ? 'focused' : ''}`}
+                  onClick={() => handleAgentSelect(agent)}
+                >
+                  <div className={`agent-item-avatar ${agent.color || 'coordinator'}`}>
+                    {agent.name.charAt(0)}
+                  </div>
+                  <span className="agent-item-name">{agent.name}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
-            {showOutreachDropdown && (
-              <div className="agent-dropdown glass-morphism" ref={outreachDropdownRef}>
-                <div className="agent-dropdown-header">
-                  <img src={OutreachIcon} alt="Outreach" className="agent-icon" />
-                  <span>Outreach Selection</span>
-                </div>
-                {outreachOptions.map((option, index) => (
-                  <div
-                    key={option}
-                    className={`agent-item ${index === focusedOutreachIndex ? 'focused' : ''}`}
-                    onClick={() => handleOutreachSelect(option)}
-                  >
-                    <img src={OutreachIcon} alt="Outreach" className="outreach-item-icon" />
-                    <span className="agent-item-name">{option}</span>
-                  </div>
-                ))}
+          {showOutreachDropdown && (
+            <div className="agent-dropdown glass-morphism" ref={outreachDropdownRef}>
+              <div className="agent-dropdown-header">
+                <img src={OutreachIcon} alt="Outreach" className="agent-icon" />
+                <span>Outreach Selection</span>
               </div>
-            )}
-            
+              {outreachOptions.map((option, index) => (
+                <div
+                  key={option}
+                  className={`agent-item ${index === focusedOutreachIndex ? 'focused' : ''}`}
+                  onClick={() => handleOutreachSelect(option)}
+                >
+                  <img src={OutreachIcon} alt="Outreach" className="outreach-item-icon" />
+                  <span className="agent-item-name">{option}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <motion.div 
+            className="input-wrapper-glass glass-morphism"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.8, ease: "easeOut" }}
+          >
             <div className="advanced-input-container">
               <div className="input-main-wrapper glass-morphism">
                 <input
@@ -252,7 +285,7 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
                   <div className="outreach-dropdown">
                     <button 
                       ref={outreachButtonRef}
-                      className="input-btn glass-morphism dropdown-btn"
+                      className={`input-btn glass-morphism dropdown-btn ${showOutreachDropdown ? 'open' : ''}`}
                       onClick={() => setShowOutreachDropdown(!showOutreachDropdown)}
                     >
                       <img src={OutreachIcon} alt="Outreach" className="btn-icon" />
@@ -279,11 +312,11 @@ const MainContent = ({ toggleSidebar, isSidebarOpen }) => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-        </div>
+          </motion.div>
+        </motion.div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

@@ -1,9 +1,15 @@
 .app {
   display: flex;
   min-height: 100vh;
-  background: url('/Assets/Images/gradii-1290x2796 (2).png') center center / cover no-repeat fixed;
   position: relative;
   overflow: hidden;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); /* Fallback background */
+}
+
+/* Ensure content appears above video */
+.app > * {
+  position: relative;
+  z-index: 10;
 }
 
 .app::before {
@@ -19,6 +25,34 @@
     radial-gradient(circle at 50% 70%, rgba(0, 0, 0, 0.1) 0%, transparent 60%);
   pointer-events: none;
   animation: backgroundFloat 20s ease-in-out infinite;
+  z-index: 2;
+}
+
+/* Video Background */
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  object-fit: cover;
+  opacity: 0.8; /* More dimmed */
+  filter: blur(5px) brightness(0.7); /* More blur and darker */
+  transform: scale(1.1); /* Scale up to hide blur edges */
+}
+
+/* Video overlay for better contrast */
+.app::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Darker overlay for more dimming */
+  z-index: 5;
+  pointer-events: none;
 }
 
 @keyframes backgroundFloat {

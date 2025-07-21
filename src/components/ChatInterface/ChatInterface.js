@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import './ChatInterface.css';
 import './PitchDeck.css';
+import './SocialMediaStyles.css';
 import AgentSelectionIcon from '../../assets/icons/Agent Selection.png';
 import OutreachIcon from '../../assets/icons/Outreach.png';
 import PitchDeckIcon from '../../assets/icons/PitchDeck.png';
@@ -46,7 +48,7 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
   const [showAgentDropdown, setShowAgentDropdown] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState('');
   const [showOutreachDropdown, setShowOutreachDropdown] = useState(false);
-  const [selectedOutreachOption, setSelectedOutreachOption] = useState('Outreach');
+  const [selectedOutreachOption, setSelectedOutreachOption] = useState('Outreach Selection');
   const [focusedAgentIndex, setFocusedAgentIndex] = useState(-1);
   const [focusedOutreachIndex, setFocusedOutreachIndex] = useState(-1);
   const [showPitchDeckGenerator, setShowPitchDeckGenerator] = useState(false);
@@ -55,6 +57,10 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
   const [showFullScreenViewer, setShowFullScreenViewer] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [editText, setEditText] = useState('');
+  const [showSocialMediaPoster, setShowSocialMediaPoster] = useState(false);
+  const [showVCList, setShowVCList] = useState(false);
+  const [socialMediaContent, setSocialMediaContent] = useState('');
+  const [vcRecommendations, setVcRecommendations] = useState([]);
   
   const agentDropdownRef = useRef(null);
   const outreachDropdownRef = useRef(null);
@@ -63,12 +69,103 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
   const agents = [
     { id: 'market', name: 'Market agent', color: 'coordinator' },
     { id: 'product', name: 'Product research agent', color: 'product' },
-    { id: 'financial', name: 'Financial agent', color: 'finance' }
+    { id: 'financial', name: 'Financial agent', color: 'finance' },
+    { id: 'outreach', name: 'Outreach agent', color: 'outreach' }
   ];
 
   const outreachOptions = [
-    'Outreach',
-    'VC List'
+    { value: 'social-media', label: 'Social Media Posting' },
+    { value: 'vc-list', label: 'VC Recommendation' }
+  ];
+
+  const socialMediaPlatforms = [
+    {
+      id: 'reddit',
+      name: 'Reddit',
+      icon: '🧡',
+      color: '#FF4500',
+      placeholder: 'Share your startup story on Reddit...',
+      characterLimit: 40000
+    },
+    {
+      id: 'linkedin',
+      name: 'LinkedIn',
+      icon: '💼',
+      color: '#0077B5',
+      placeholder: 'Professional post for LinkedIn...',
+      characterLimit: 3000
+    },
+    {
+      id: 'twitter',
+      name: 'X (Twitter)',
+      icon: '🐦',
+      color: '#1DA1F2',
+      placeholder: 'Tweet about your startup...',
+      characterLimit: 280
+    }
+  ];
+
+  const vcData = [
+    {
+      id: 1,
+      name: 'Greylock Partners',
+      description: 'They have a strong focus on AI and enterprise software.',
+      website: 'https://www.greylock.com/',
+      linkedin: 'https://www.linkedin.com/company/greylock-partners/',
+      twitter: 'https://twitter.com/greylockpartners',
+      crunchbase: 'https://www.crunchbase.com/organization/greylock-partners',
+      tags: ['AI', 'Enterprise Software', 'Seed to Series C'],
+      focus: 'AI, Enterprise Software',
+      stage: 'Seed to Series C'
+    },
+    {
+      id: 2,
+      name: 'Andreessen Horowitz',
+      description: 'They have a dedicated AI fund and invest in enterprise software.',
+      website: 'https://a16z.com/',
+      linkedin: 'https://www.linkedin.com/company/andreessen-horowitz/',
+      twitter: 'https://twitter.com/a16z',
+      crunchbase: 'https://www.crunchbase.com/organization/andreessen-horowitz',
+      tags: ['AI', 'Enterprise Software', 'Seed to Series C'],
+      focus: 'AI, Enterprise Software',
+      stage: 'Seed to Series C'
+    },
+    {
+      id: 3,
+      name: 'Spark Capital',
+      description: 'They have a strong focus on AI and enterprise software, with investments in Instabase.',
+      website: 'https://www.sparkcapital.com/',
+      linkedin: 'https://www.linkedin.com/company/spark-capital/',
+      twitter: 'https://twitter.com/spark_capital',
+      crunchbase: 'https://www.crunchbase.com/organization/spark-capital',
+      tags: ['AI', 'Enterprise Software', 'Seed to Series C'],
+      focus: 'AI, Enterprise Software',
+      stage: 'Seed to Series C'
+    },
+    {
+      id: 4,
+      name: 'Tribe Capital',
+      description: 'They have a strong focus on AI and enterprise software, with investments in Instabase.',
+      website: 'https://www.tribecapital.com/',
+      linkedin: 'https://www.linkedin.com/company/tribe-capital/',
+      twitter: 'https://twitter.com/tribe_capital',
+      crunchbase: 'https://www.crunchbase.com/organization/tribe-capital',
+      tags: ['AI', 'Enterprise Software', 'Seed to Series C'],
+      focus: 'AI, Enterprise Software',
+      stage: 'Seed to Series C'
+    },
+    {
+      id: 5,
+      name: 'Index Ventures',
+      description: 'They have a strong focus on AI and enterprise software, with investments in Instabase.',
+      website: 'https://www.indexventures.com/',
+      linkedin: 'https://www.linkedin.com/company/index-ventures/',
+      twitter: 'https://twitter.com/indexventures',
+      crunchbase: 'https://www.crunchbase.com/organization/index-ventures',
+      tags: ['AI', 'Enterprise Software', 'Seed to Series C'],
+      focus: 'AI, Enterprise Software',
+      stage: 'Seed to Series C'
+    }
   ];
 
   const pitchDeckTemplates = [
@@ -275,6 +372,7 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
     if (agentName.includes('Coordinator')) return 'coordinator';
     if (agentName.includes('Product')) return 'product';
     if (agentName.includes('Finance')) return 'finance';
+    if (agentName.includes('Outreach')) return 'outreach';
     return 'coordinator';
   };
 
@@ -298,9 +396,100 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
   };
 
   const handleOutreachSelect = (option) => {
-    setSelectedOutreachOption(option);
+    setSelectedOutreachOption(option.label || option);
     setShowOutreachDropdown(false);
     setFocusedOutreachIndex(-1);
+    
+    // Handle different option types by adding chat messages
+    if (option.value === 'vc-list') {
+      const vcMessage = {
+        id: messages.length + 1,
+        type: 'agent',
+        agent: 'Outreach agent',
+        content: 'vc-recommendations',
+        timestamp: new Date().toISOString(),
+        vcData: vcData
+      };
+      setMessages(prev => [...prev, vcMessage]);
+    } else if (option.value === 'social-media') {
+      const socialMediaMessage = {
+        id: messages.length + 1,
+        type: 'agent',
+        agent: 'Outreach agent',
+        content: 'social-media-cards',
+        timestamp: new Date().toISOString(),
+        platforms: socialMediaPlatforms
+      };
+      setMessages(prev => [...prev, socialMediaMessage]);
+    }
+  };
+
+  const handlePreview = (platform, content) => {
+    if (!content.trim()) {
+      alert('Please write some content first!');
+      return;
+    }
+
+    const previewMessage = {
+      id: Date.now(),
+      type: 'agent',
+      agent: 'Outreach agent',
+      content: `preview-${platform}`,
+      previewData: {
+        platform,
+        content: content.trim()
+      },
+      timestamp: new Date().toISOString()
+    };
+    
+    setMessages(prev => [...prev, previewMessage]);
+  };
+
+  const handlePost = (platform, content) => {
+    if (!content.trim()) {
+      alert('Please write some content first!');
+      return;
+    }
+
+    // Simulate posting delay
+    setTimeout(() => {
+      const successMessage = {
+        id: Date.now(),
+        type: 'agent',
+        agent: 'Outreach agent',
+        content: 'post-success',
+        postData: {
+          platform,
+          content: content.trim(),
+          timestamp: new Date().toLocaleString()
+        },
+        timestamp: new Date().toISOString()
+      };
+      
+      setMessages(prev => [...prev, successMessage]);
+    }, 1500);
+  };
+
+  const generateAIPost = (platform) => {
+    const templates = {
+      'Reddit': [
+        "🚀 Just launched our startup and wanted to share our journey with the community! We're building an AI-powered solution that helps businesses automate their workflow. The challenges we faced during development taught us so much about resilience and innovation. What's been your biggest lesson as an entrepreneur? Would love to hear your stories! #startup #entrepreneur #AI #innovation",
+        "📈 After 6 months of development, we're finally ready to show our product to the world! Our team has been working tirelessly to create something that solves real problems. The feedback from beta users has been incredible. For fellow founders - what was your 'aha moment' when you knew your idea was worth pursuing? #startuplife #product #feedback",
+        "💡 Building a startup while working full-time is no joke! But the passion for solving real problems keeps us going. We're creating tools that make business operations smoother and more efficient. To all the side-project entrepreneurs out there - how do you manage your time and stay motivated? #sideproject #startup #motivation"
+      ],
+      'LinkedIn': [
+        "Excited to announce that our team has been working on an innovative AI solution that's set to transform how businesses handle their operations. After months of research and development, we're proud to share our progress with the LinkedIn community. Looking forward to connecting with fellow innovators and potential partners. #Innovation #AI #BusinessSolution #Startup",
+        "Thrilled to share a major milestone in our entrepreneurial journey! Our startup has reached a significant development phase, and we're seeing tremendous potential in our AI-driven platform. The experience of building something from the ground up has been both challenging and rewarding. Grateful for the support of our network. #Entrepreneurship #Startup #AI #Innovation #Growth",
+        "Reflecting on the incredible journey of building our startup from concept to reality. The lessons learned, the challenges overcome, and the relationships built along the way have been invaluable. Our AI-powered solution is now ready to make a real impact in the business world. #StartupJourney #AI #Innovation #BusinessGrowth #Entrepreneurship"
+      ],
+      'X (Twitter)': [
+        "🚀 Just dropped our latest AI tool that's going to change the game for businesses everywhere! The future is automated, and we're here for it. #AI #startup #innovation #tech",
+        "💡 6 months of coding, countless coffee cups, and one amazing team later... our startup is ready to launch! Who else is building something cool? #startup #entrepreneur #buildinpublic",
+        "🔥 AI + Business automation = Magic ✨ Our new platform is live and we couldn't be more excited! DMs open for feedback 📩 #AI #startup #launch #tech"
+      ]
+    };
+
+    return templates[platform][Math.floor(Math.random() * templates[platform].length)];
   };
 
   const handleSendMessage = () => {
@@ -377,27 +566,96 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
     }
   };
 
+  // Animation variants
+  const messageVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 50, 
+      scale: 0.8 
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    },
+    exit: {
+      opacity: 0,
+      y: -50,
+      scale: 0.8,
+      transition: {
+        duration: 0.3
+      }
+    }
+  };
+
+  const bubbleVariants = {
+    hidden: { scale: 0.8, opacity: 0 },
+    visible: { 
+      scale: 1, 
+      opacity: 1,
+      transition: {
+        delay: 0.1,
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
-    <div className="chat-interface">
-      <div className="chat-messages">
-        {messages.map((message) => (
-          <div key={message.id} className={`message ${message.type}`}>
-            {message.type === 'agent' && (
-              <div className="agent-info">
-                <div className={`agent-avatar ${getAgentColor(message.agent)}`}>
-                  <span className="agent-initial">
-                    {message.agent.charAt(0)}
-                  </span>
-                </div>
-                <span className="agent-name">{message.agent}</span>
-              </div>
-            )}
-            <div className={`message-bubble glass-morphism ${message.type} ${message.type === 'agent' ? getAgentColor(message.agent) : ''}`}>
-              {message.type === 'user' && (
-                <div className="user-avatar">
-                  <span className="user-initial">U</span>
-                </div>
+    <motion.div 
+      className="chat-interface"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <motion.div className="chat-messages">
+        <AnimatePresence>
+          {messages.map((message, index) => (
+            <motion.div 
+              key={message.id} 
+              className={`message ${message.type}`}
+              variants={messageVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              layout
+              custom={index}
+            >
+              {message.type === 'agent' && (
+                <motion.div 
+                  className="agent-info"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <motion.div 
+                    className={`agent-avatar ${getAgentColor(message.agent)}`}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <span className="agent-initial">
+                      {message.agent.charAt(0)}
+                    </span>
+                  </motion.div>
+                  <span className="agent-name">{message.agent}</span>
+                </motion.div>
               )}
+              <motion.div 
+                className={`message-bubble glass-morphism ${message.type} ${message.type === 'agent' ? getAgentColor(message.agent) : ''}`}
+                variants={bubbleVariants}
+                transition={{ duration: 0.2 }}
+              >
+                {message.type === 'user' && (
+                  <motion.div 
+                    className="user-avatar"
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <span className="user-initial">U</span>
+                  </motion.div>
+                )}
               <div className="message-content">
                 {message.content}
                 
@@ -523,13 +781,284 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
                       </div>
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
-      <div className={`chat-input-container ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
+                {/* VC Recommendations */}
+                {message.content === 'vc-recommendations' && (
+                  <div className="vc-recommendations-bubble">
+                    <div className="bubble-header">
+                      <h3>Recommended VCs for Your Startup</h3>
+                      <p>Here are some top VCs that match your startup profile:</p>
+                    </div>
+                    
+                    <div className="vc-cards-container">
+                      {message.vcData?.map((vc, index) => (
+                        <div key={vc.id} className="vc-card-glass glass-morphism">
+                          <div className="vc-card-header">
+                            <div className="vc-number-badge glass-morphism">
+                              {index + 1}
+                            </div>
+                            <div className="vc-firm-info">
+                              <h4 className="vc-firm-name">{vc.name}</h4>
+                              <p className="vc-description">{vc.description}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="vc-tags-section">
+                            <div className="tags-container">
+                              {vc.tags.map((tag, tagIndex) => (
+                                <span key={tagIndex} className="vc-tag glass-morphism">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div className="vc-links-grid">
+                            <div className="vc-link-card glass-morphism">
+                              <div className="link-icon">🌐</div>
+                              <div className="link-content">
+                                <span className="link-label">Website</span>
+                                <a href={vc.website} target="_blank" rel="noopener noreferrer" className="link-url">
+                                  {vc.website.replace('https://', '').replace('www.', '')}
+                                </a>
+                              </div>
+                            </div>
+                            
+                            <div className="vc-link-card glass-morphism">
+                              <div className="link-icon">💼</div>
+                              <div className="link-content">
+                                <span className="link-label">LinkedIn</span>
+                                <a href={vc.linkedin} target="_blank" rel="noopener noreferrer" className="link-url">
+                                  View Profile
+                                </a>
+                              </div>
+                            </div>
+                            
+                            <div className="vc-link-card glass-morphism">
+                              <div className="link-icon">🐦</div>
+                              <div className="link-content">
+                                <span className="link-label">Twitter</span>
+                                <a href={vc.twitter} target="_blank" rel="noopener noreferrer" className="link-url">
+                                  Follow
+                                </a>
+                              </div>
+                            </div>
+                            
+                            <div className="vc-link-card glass-morphism">
+                              <div className="link-icon">🏢</div>
+                              <div className="link-content">
+                                <span className="link-label">Crunchbase</span>
+                                <a href={vc.crunchbase} target="_blank" rel="noopener noreferrer" className="link-url">
+                                  View Data
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="vc-actions">
+                            <button className="vc-action-btn contact-btn glass-morphism">
+                              <span className="btn-icon">✉️</span>
+                              Contact
+                            </button>
+                            <button className="vc-action-btn research-btn glass-morphism">
+                              <span className="btn-icon">🔍</span>
+                              Research
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Social Media Cards */}
+                {message.content === 'social-media-cards' && (
+                  <div className="social-media-bubble">
+                    <div className="bubble-header">
+                      <h3>Social Media Post Generator</h3>
+                      <p>AI-generated posts ready for your review:</p>
+                    </div>
+                    
+                    <div className="social-platforms-grid">
+                      {message.platforms?.map((platform) => {
+                        const aiGeneratedPost = generateAIPost(platform.name);
+                        const textareaId = `textarea-${platform.id}-${message.id}`;
+                        
+                        return (
+                          <div key={platform.id} className="social-platform-card glass-morphism">
+                            <div className="platform-header">
+                              <div className="platform-info">
+                                <span className="platform-icon">{platform.icon}</span>
+                                <span className="platform-name">{platform.name}</span>
+                              </div>
+                              <div className="character-count">
+                                {aiGeneratedPost.length}/{platform.characterLimit}
+                              </div>
+                            </div>
+                            
+                            <textarea
+                              id={textareaId}
+                              className="social-textarea"
+                              placeholder={platform.placeholder}
+                              maxLength={platform.characterLimit}
+                              defaultValue={aiGeneratedPost}
+                              style={{ borderColor: platform.color }}
+                              onChange={(e) => {
+                                const charCount = e.target.value.length;
+                                e.target.parentElement.querySelector('.character-count').textContent = `${charCount}/${platform.characterLimit}`;
+                              }}
+                            />
+                            
+                            <div className="platform-actions">
+                              <button 
+                                className="preview-btn"
+                                style={{ backgroundColor: platform.color }}
+                                onClick={() => {
+                                  const textarea = document.getElementById(textareaId);
+                                  handlePreview(platform.name, textarea.value);
+                                }}
+                              >
+                                Preview
+                              </button>
+                              <button 
+                                className="post-btn"
+                                style={{ backgroundColor: platform.color }}
+                                onClick={() => {
+                                  const textarea = document.getElementById(textareaId);
+                                  handlePost(platform.name, textarea.value);
+                                }}
+                              >
+                                Post to {platform.name}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Platform Preview Messages */}
+                {(message.content?.startsWith('preview-') || message.content === 'post-success') && (
+                  <div className="platform-preview-bubble">
+                    {message.content?.startsWith('preview-') && message.previewData && (
+                      <div className="preview-container">
+                        <div className="preview-header">
+                          <h3>📱 {message.previewData.platform} Preview</h3>
+                          <p>This is how your post will appear:</p>
+                        </div>
+                        
+                        {message.previewData.platform === 'Reddit' && (
+                          <div className="reddit-preview glass-morphism">
+                            <div className="reddit-post">
+                              <div className="reddit-votes">
+                                <div className="vote-arrow">⬆</div>
+                                <div className="vote-count">•</div>
+                                <div className="vote-arrow">⬇</div>
+                              </div>
+                              <div className="reddit-content">
+                                <div className="reddit-header">
+                                  <span className="subreddit">r/startups</span>
+                                  <span className="posted-by">• Posted by u/YourUsername • now</span>
+                                </div>
+                                <div className="reddit-title">Startup Journey Update</div>
+                                <div className="reddit-text">{message.previewData.content}</div>
+                                <div className="reddit-actions">
+                                  <span className="action">💬 Comments</span>
+                                  <span className="action">📤 Share</span>
+                                  <span className="action">💾 Save</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {message.previewData.platform === 'LinkedIn' && (
+                          <div className="linkedin-preview glass-morphism">
+                            <div className="linkedin-post">
+                              <div className="linkedin-header">
+                                <div className="profile-pic">👤</div>
+                                <div className="profile-info">
+                                  <div className="name">Your Name</div>
+                                  <div className="title">Entrepreneur • Startup Founder</div>
+                                  <div className="time">Now • 🌐</div>
+                                </div>
+                              </div>
+                              <div className="linkedin-content">{message.previewData.content}</div>
+                              <div className="linkedin-actions">
+                                <span className="action">👍 Like</span>
+                                <span className="action">💬 Comment</span>
+                                <span className="action">🔄 Repost</span>
+                                <span className="action">📤 Send</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {message.previewData.platform === 'X (Twitter)' && (
+                          <div className="twitter-preview glass-morphism">
+                            <div className="twitter-post">
+                              <div className="twitter-header">
+                                <div className="profile-pic">👤</div>
+                                <div className="profile-info">
+                                  <div className="name-verified">
+                                    <span className="name">Your Name</span>
+                                    <span className="verified">✓</span>
+                                  </div>
+                                  <div className="username">@yourusername • now</div>
+                                </div>
+                              </div>
+                              <div className="twitter-content">{message.previewData.content}</div>
+                              <div className="twitter-actions">
+                                <span className="action">💬 Reply</span>
+                                <span className="action">🔄 Repost</span>
+                                <span className="action">❤️ Like</span>
+                                <span className="action">📤 Share</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {message.content === 'post-success' && message.postData && (
+                      <div className="success-container">
+                        <div className="success-header">
+                          <h3>🎉 Post Published Successfully!</h3>
+                          <p>Your content is now live on {message.postData.platform}</p>
+                        </div>
+                        
+                        <div className="success-details glass-morphism">
+                          <div className="success-platform">
+                            <span className="platform-badge">{message.postData.platform}</span>
+                            <span className="success-time">Published at {message.postData.timestamp}</span>
+                          </div>
+                          <div className="success-preview">
+                            <p>"{message.postData.content.substring(0, 100)}..."</p>
+                          </div>
+                          <div className="success-actions">
+                            <button className="view-post-btn">View Post</button>
+                            <button className="share-link-btn">Copy Link</button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              </div>
+              </motion.div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </motion.div>
+
+      <motion.div 
+        className={`chat-input-container ${!isSidebarOpen ? 'sidebar-closed' : ''}`}
+        initial={{ y: 50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+      >
         {showAgentDropdown && (
           <div className="agent-dropdown glass-morphism" ref={agentDropdownRef}>
             <div className="agent-dropdown-header">
@@ -559,12 +1088,12 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
             </div>
             {outreachOptions.map((option, index) => (
               <div
-                key={option}
+                key={option.value || option}
                 className={`agent-item ${index === focusedOutreachIndex ? 'focused' : ''}`}
                 onClick={() => handleOutreachSelect(option)}
               >
                 <img src={OutreachIcon} alt="Outreach" className="outreach-item-icon" />
-                <span className="agent-item-name">{option}</span>
+                <span className="agent-item-name">{option.label || option}</span>
               </div>
             ))}
           </div>
@@ -625,7 +1154,7 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Full Screen PPT Viewer */}
       {showFullScreenViewer && (
@@ -713,7 +1242,7 @@ const ChatInterface = ({ onBack, isSidebarOpen }) => {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

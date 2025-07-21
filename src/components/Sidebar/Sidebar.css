@@ -11,7 +11,7 @@
   left: 0;
   z-index: 10;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  overflow: hidden;
+  overflow: visible;
   transform-origin: left center;
 }
 
@@ -179,6 +179,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow: visible;
 }
 
 .sidebar.closed .sidebar-nav {
@@ -324,7 +325,7 @@
 }
 
 .nav-submenu {
-  overflow: hidden;
+  overflow: visible;
   max-height: 0;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   margin-left: 20px;
@@ -335,6 +336,7 @@
   max-height: 200px;
   opacity: 1;
   padding-top: 8px;
+  overflow: visible;
 }
 
 .nav-subitem {
@@ -349,6 +351,7 @@
   font-size: 13px;
   margin-bottom: 4px;
   position: relative;
+  overflow: visible;
 }
 
 /* Adjust padding for subitems without icons */
@@ -357,20 +360,10 @@
 }
 
 .nav-subitem:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.9);
-  transform: translateX(4px);
-}
-
-.nav-subitem.active {
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.95);
+  transform: translateX(4px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.nav-subitem.active:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: translateX(2px);
 }
 
 .subitem-menu {
@@ -379,11 +372,74 @@
   color: rgba(255, 255, 255, 0.5);
   opacity: 0;
   transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  position: relative;
 }
 
-.nav-subitem.active .subitem-menu,
+.subitem-menu:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .nav-subitem:hover .subitem-menu {
   opacity: 1;
+}
+
+.subitem-menu-container {
+  position: relative;
+  margin-left: auto;
+  z-index: 10;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: -8px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 8px 0;
+  min-width: 120px;
+  z-index: 9999;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  margin-top: 4px;
+  transform-origin: top right;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 1);
+}
+
+.dropdown-item.delete {
+  color: rgba(239, 68, 68, 0.9);
+}
+
+.dropdown-item.delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: rgba(239, 68, 68, 1);
 }
 
 .subitem-icon {
